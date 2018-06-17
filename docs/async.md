@@ -460,7 +460,7 @@ async function dbFuc(db) {
 }
 ```
 
-目前，[`@std/esm`](https://www.npmjs.com/package/@std/esm)模块加载器支持顶层`await`，即`await`命令可以不放在 async 函数里面，直接使用。
+目前，[`esm`](https://www.npmjs.com/package/esm)模块加载器支持顶层`await`，即`await`命令可以不放在 async 函数里面，直接使用。
 
 ```javascript
 // async 函数的写法
@@ -476,7 +476,7 @@ const res = await fetch('google.com');
 console.log(await res.text());
 ```
 
-上面代码中，第二种写法的脚本必须使用`@std/esm`加载器，才会生效。
+上面代码中，第二种写法的脚本必须使用`esm`加载器，才会生效。
 
 ## async 函数的实现原理
 
@@ -913,7 +913,7 @@ async function* prefixLines(asyncIterable) {
 }
 ```
 
-异步 Generator 函数的返回值是一个异步 Iterator，即每次调用它的`next`方法，会返回一个 Promise 对象，也就是说，跟在`yield`命令后面的，应该是一个 Promise 对象。
+异步 Generator 函数的返回值是一个异步 Iterator，即每次调用它的`next`方法，会返回一个 Promise 对象，也就是说，跟在`yield`命令后面的，应该是一个 Promise 对象。如果像上面那个例子那样，`yield`命令后面是一个字符串，会被自动包装成一个 Promise 对象。
 
 ```javascript
 function fetchRandom() {

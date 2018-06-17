@@ -861,13 +861,13 @@ JavaScript 语言的对象继承是通过原型链实现的。ES6 提供了更�
 `__proto__`属性（前后各两个下划线），用来读取或设置当前对象的`prototype`对象。目前，所有浏览器（包括 IE11）都部署了这个属性。
 
 ```javascript
-// es6 的写法
+// es5 的写法
 const obj = {
   method: function() { ... }
 };
 obj.__proto__ = someOtherObj;
 
-// es5 的写法
+// es6 的写法
 var obj = Object.create(someOtherObj);
 obj.method = function() { ... };
 ```
@@ -1426,8 +1426,6 @@ let newVersion = {
 ```javascript
 let aWithDefaults = { x: 1, y: 2, ...a };
 // 等同于
- even if property keys don’t clash, because objects record insertion order:
-
 let aWithDefaults = Object.assign({}, { x: 1, y: 2 }, a);
 // 等同于
 let aWithDefaults = Object.assign({ x: 1, y: 2 }, a);
@@ -1447,8 +1445,6 @@ const obj = {
 ```javascript
 {...{}, a: 1}
 // { a: 1 }
- even if property keys don’t clash, because objects record insertion order:
-
 ```
 
 如果扩展运算符的参数是`null`或`undefined`，这两个值会被忽略，不会报错。
