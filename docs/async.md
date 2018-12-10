@@ -28,7 +28,7 @@ const gen = function* () {
 };
 ```
 
-写成`async`函数，就是下面这样。
+上面代码的函数`gen`可以写成`async`函数，就是下面这样。
 
 ```javascript
 const asyncReadFile = async function () {
@@ -210,10 +210,12 @@ getTitle('https://tc39.github.io/ecma262/').then(console.log)
 
 ### await 命令
 
-正常情况下，`await`命令后面是一个 Promise 对象。如果不是，会被转成一个立即`resolve`的 Promise 对象。
+正常情况下，`await`命令后面是一个 Promise 对象，返回该对象的结果。如果不是 Promise 对象，就直接返回对应的值。
 
 ```javascript
 async function f() {
+  // 等同于
+  // return 123;
   return await 123;
 }
 
@@ -221,7 +223,31 @@ f().then(v => console.log(v))
 // 123
 ```
 
-上面代码中，`await`命令的参数是数值`123`，它被转成 Promise 对象，并立即`resolve`。
+上面代码中，`await`命令的参数是数值`123`，这时等同于`return 123`。
+
+另一种情况是，`await`命令后面是一个`thenable`对象（即定义`then`方法的对象），那么`await`会将其等同于 Promise 对象。
+
+```javascript
+class Sleep {
+  constructor(timeout) {
+    this.timeout = timeout;
+  }
+  then(resolve, reject) {
+    const startTime = Date.now();
+    setTimeout(
+      () => resolve(Date.now() - startTime),
+      this.timeout
+    );
+  }
+}
+
+(async () => {
+  const actualTime = await new Sleep(1000);
+  console.log(actualTime);
+})();
+```
+
+上面代码中，`await`命令后面是一个`Sleep`对象的实例。这个实例不是 Promise 对象，但是因为定义了`then`方法，`await`会将其视为`Promise`处理。
 
 `await`命令后面的 Promise 对象如果变为`reject`状态，则`reject`的参数会被`catch`方法的回调函数接收到。
 
@@ -238,7 +264,7 @@ f()
 
 注意，上面代码中，`await`语句前面没有`return`，但是`reject`方法的参数依然传入了`catch`方法的回调函数。这里如果在`await`前面加上`return`，效果是一样的。
 
-只要一个`await`语句后面的 Promise 变为`reject`，那么整个`async`函数都会中断执行。
+任何一个`await`语句后面的 Promise 对象变为`reject`状态，那么整个`async`函数都会中断执行。
 
 ```javascript
 async function f() {
@@ -477,6 +503,27 @@ console.log(await res.text());
 ```
 
 上面代码中，第二种写法的脚本必须使用`esm`加载器，才会生效。
+
+第四点，async 函数可以保留运行堆栈。
+
+```javascript
+const a = () => {
+  b().then(() => c());
+};
+```
+
+上面代码中，函数`a`内部运行了一个异步任务`b()`。当`b()`运行的时候，函数`a()`不会中断，而是继续执行。等到`b()`运行结束，可能`a()`早就运行结束了，`b()`所在的上下文环境已经消失了。如果`b()`或`c()`报错，错误堆栈将不包括`a()`。
+
+现在将这个例子改成`async`函数。
+
+```javascript
+const a = async () => {
+  await b();
+  c();
+};
+```
+
+上面代码中，`b()`运行的时候，`a()`是暂停执行，上下文环境都保存着。一旦`b()`或`c()`，错误堆栈将包括`a()`。
 
 ## async 函数的实现原理
 
@@ -722,9 +769,10 @@ async function f() {
 注意，异步遍历器的`next`方法是可以连续调用的，不必等到上一步产生的 Promise 对象`resolve`以后再调用。这种情况下，`next`方法会累积起来，自动按照每一步的顺序运行下去。下面是一个例子，把所有的`next`方法放在`Promise.all`方法里面。
 
 ```javascript
-const asyncGenObj = createAsyncIterable(['a', 'b']);
+const asyncIterable = createAsyncIterable(['a', 'b']);
+const asyncIterator = asyncIterable[Symbol.asyncIterator]();
 const [{value: v1}, {value: v2}] = await Promise.all([
-  asyncGenObj.next(), asyncGenObj.next()
+  asyncIterator.next(), asyncIterator.next()
 ]);
 
 console.log(v1, v2); // a b

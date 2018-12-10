@@ -73,6 +73,7 @@
 
 - Nicolas Bevacqua, [ES6 Number Improvements in Depth](http://ponyfoo.com/articles/es6-number-improvements-in-depth)
 - Axel Rauschmayer, [ES proposal: arbitrary precision integers](http://2ality.com/2017/03/es-integer.html)
+- Mathias Bynens, [BigInt: arbitrary-precision integers in JavaScript](https://developers.google.com/web/updates/2018/05/bigint)
 
 ## 数组
 
@@ -93,6 +94,7 @@
 - Mark McDonnell, [Understanding recursion in functional JavaScript programming](http://www.integralist.co.uk/posts/js-recursion.html): 如何自己实现尾递归优化
 - Nicholas C. Zakas, [The ECMAScript 2016 change you probably don't know](https://www.nczonline.net/blog/2016/10/the-ecmascript-2016-change-you-probably-dont-know/): 使用参数默认值时，不能在函数内部显式开启严格模式
 - Axel Rauschmayer, [ES proposal: optional catch binding](http://2ality.com/2017/08/optional-catch-binding.html)
+- Cynthia Lee, [When you should use ES6 arrow functions — and when you shouldn’t](https://medium.freecodecamp.org/when-and-why-you-should-use-es6-arrow-functions-and-when-you-shouldnt-3d851d7f0b26): 讨论箭头函数的适用场合
 
 ## 对象
 
@@ -102,6 +104,7 @@
 - Axel Rauschmayer, [Enumerability in ECMAScript 6](http://www.2ality.com/2015/10/enumerability-es6.html)
 - Axel Rauschmayer, [ES proposal: Object.getOwnPropertyDescriptors()](http://www.2ality.com/2016/02/object-getownpropertydescriptors.html)
 - TC39, [Object.getOwnPropertyDescriptors Proposal](https://github.com/tc39/proposal-object-getownpropertydescriptors)
+- David Titarenco, [How Spread Syntax Breaks Javascript](https://dvt.name/2018/06/02/spread-syntax-breaks-javascript/): 扩展运算符的一些不合理的地方
 
 ## Symbol
 
@@ -189,6 +192,7 @@
 - Axel Rauschmayer, [ES proposal: asynchronous iteration](http://www.2ality.com/2016/10/asynchronous-iteration.html): 异步遍历器的详细介绍
 - Dima Grossman, [How to write async await without try-catch blocks in Javascript](http://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/): 除了 try/catch 以外的 async 函数内部捕捉错误的方法
 - Mostafa Gaafa, [6 Reasons Why JavaScript’s Async/Await Blows Promises Away](https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9): Async 函数的6个好处
+- Mathias Bynens, [Asynchronous stack traces: why await beats Promise#then()](https://mathiasbynens.be/notes/async-stack-traces): async 函数可以保留错误堆栈
 
 ## Class
 
@@ -198,6 +202,8 @@
 - Axel Rauschmayer, [Classes in ECMAScript 6 (final semantics)](http://www.2ality.com/2015/02/es6-classes-final.html): Class 语法的详细介绍和设计思想分析
 - Eric Faust, [ES6 In Depth: Subclassing](https://hacks.mozilla.org/2015/08/es6-in-depth-subclassing/): Class 语法的深入介绍
 - Nicolás Bevacqua, [Binding Methods to Class Instance Objects](https://ponyfoo.com/articles/binding-methods-to-class-instance-objects): 如何绑定类的实例中的 this
+- Jamie Kyle, [JavaScript's new #private class fields](https://jamie.build/javascripts-new-private-class-fields.html)：私有属性的介绍。
+
 
 ## Decorator
 
@@ -231,6 +237,7 @@
 - Axel Rauschmayer, [ES proposal: Shared memory and atomics](http://2ality.com/2017/01/shared-array-buffer.html)
 - Lin Clark, [Avoiding race conditions in SharedArrayBuffers with Atomics](https://hacks.mozilla.org/2017/06/avoiding-race-conditions-in-sharedarraybuffers-with-atomics/): Atomics 对象使用场景的解释
 - Lars T Hansen, [Shared memory - a brief tutorial](https://github.com/tc39/ecmascript_sharedmem/blob/master/TUTORIAL.md)
+- James Milner, [The Return of SharedArrayBuffers and Atomics](https://www.sitepen.com/blog/2018/09/19/the-return-of-sharedarraybuffers-and-atomics/)
 
 ## SIMD
 
