@@ -371,7 +371,7 @@ const MyClass = class Me {
 };
 ```
 
-上面代码使用表达式定义了一个类。需要注意的是，这个类的名字是`MyClass`而不是`Me`，`Me`只在 Class 的内部代码可用，指代当前类。
+上面代码使用表达式定义了一个类。需要注意的是，这个类的名字是`Me`，但是`Me`只在 Class 的内部可用，指代当前类。在 Class 外部，这个类只能用`MyClass`引用。
 
 ```javascript
 let inst = new MyClass();
@@ -488,7 +488,7 @@ const { printName } = logger;
 printName(); // TypeError: Cannot read property 'print' of undefined
 ```
 
-上面代码中，`printName`方法中的`this`，默认指向`Logger`类的实例。但是，如果将这个方法提取出来单独使用，`this`会指向该方法运行时所在的环境，因为找不到`print`方法而导致报错。
+上面代码中，`printName`方法中的`this`，默认指向`Logger`类的实例。但是，如果将这个方法提取出来单独使用，`this`会指向该方法运行时所在的环境（由于 class 内部是严格模式，所以 this 实际指向的是`undefined`），从而导致找不到`print`方法而报错。
 
 一个比较简单的解决方法是，在构造方法中绑定`this`，这样就不会找不到`print`方法了。
 
@@ -664,7 +664,7 @@ class foo {
 }
 ```
 
-上面的代码，一眼就能看出，`foo`类有两个实例属性，一目了然。另外，写起来也比较间洁。
+上面的代码，一眼就能看出，`foo`类有两个实例属性，一目了然。另外，写起来也比较简洁。
 
 ## 静态属性
 
@@ -923,7 +923,7 @@ FakeMath.#computeRandomNumber() // 报错
 
 ## new.target 属性
 
-`new`是从构造函数生成实例对象的命令。ES6 为`new`命令引入了一个`new.target`属性，该属性一般用在构造函数之中，返回`new`命令作用于的那个构造函数。如果构造函数不是通过`new`命令调用的，`new.target`会返回`undefined`，因此这个属性可以用来确定构造函数是怎么调用的。
+`new`是从构造函数生成实例对象的命令。ES6 为`new`命令引入了一个`new.target`属性，该属性一般用在构造函数之中，返回`new`命令作用于的那个构造函数。如果构造函数不是通过`new`命令或`Reflect.construct()`调用的，`new.target`会返回`undefined`，因此这个属性可以用来确定构造函数是怎么调用的。
 
 ```javascript
 function Person(name) {
@@ -975,7 +975,7 @@ class Rectangle {
 
 class Square extends Rectangle {
   constructor(length) {
-    super(length, length);
+    super(length, width);
   }
 }
 
