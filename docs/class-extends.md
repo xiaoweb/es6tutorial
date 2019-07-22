@@ -169,7 +169,7 @@ class B extends A {
 }
 ```
 
-上面代码中，`super()`用在`B`类的`m`方法之中，就会造成句法错误。
+上面代码中，`super()`用在`B`类的`m`方法之中，就会造成语法错误。
 
 第二种情况，`super`作为对象时，在普通方法中，指向父类的原型对象；在静态方法中，指向父类。
 
@@ -447,7 +447,7 @@ B.__proto__ = A;
 这两条继承链，可以这样理解：作为一个对象，子类（`B`）的原型（`__proto__`属性）是父类（`A`）；作为一个构造函数，子类（`B`）的原型对象（`prototype`属性）是父类的原型对象（`prototype`属性）的实例。
 
 ```javascript
-Object.create(A.prototype);
+B.prototype = Object.create(A.prototype);
 // 等同于
 B.prototype.__proto__ = A.prototype;
 ```
