@@ -72,7 +72,7 @@ set.add(b);
 set // Set {NaN}
 ```
 
-上面代码向 Set 实例添加了两个`NaN`，但是只能加入一个。这表明，在 Set 内部，两个`NaN`是相等。
+上面代码向 Set 实例添加了两次`NaN`，但是只会加入一个。这表明，在 Set 内部，两个`NaN`是相等的。
 
 另外，两个对象总是不相等的。
 
@@ -354,7 +354,7 @@ const ws = new WeakSet(b);
 // Uncaught TypeError: Invalid value used in weak set(…)
 ```
 
-上面代码中，数组`b`的成员不是对象，加入 WeaKSet 就会报错。
+上面代码中，数组`b`的成员不是对象，加入 WeakSet 就会报错。
 
 WeakSet 结构有以下三个方法。
 
@@ -522,7 +522,7 @@ map.set(['a'], 555);
 map.get(['a']) // undefined
 ```
 
-上面代码的`set`和`get`方法，表面是针对同一个键，但实际上这是两个值，内存地址是不一样的，因此`get`方法无法读取该键，返回`undefined`。
+上面代码的`set`和`get`方法，表面是针对同一个键，但实际上这是两个不同的数组实例，内存地址是不一样的，因此`get`方法无法读取该键，返回`undefined`。
 
 同理，同样的值的两个实例，在 Map 结构中被视为两个键。
 

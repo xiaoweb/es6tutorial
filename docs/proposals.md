@@ -129,21 +129,29 @@ const firstName = (message
   && message.body.user.firstName) || 'default';
 ```
 
+或者使用三元运算符`?:`，判断一个对象是否存在。
+
+```javascript
+const fooInput = myForm.querySelector('input[name=foo]')
+const fooValue = fooInput ? fooInput.value : undefined
+```
+
 这样的层层判断非常麻烦，因此现在有一个[提案](https://github.com/tc39/proposal-optional-chaining)，引入了“链判断运算符”（optional chaining operator）`?.`，简化上面的写法。
 
 ```javascript
 const firstName = message?.body?.user?.firstName || 'default';
+const fooValue = myForm.querySelector('input[name=foo]')?.value
 ```
 
-上面代码有三个`?.`运算符，直接在链式调用的时候判断，左侧的对象是否为`null`或`undefined`。如果是的，就不再往下运算，而是返回`undefined`。
+上面代码使用了`?.`运算符，直接在链式调用的时候判断，左侧的对象是否为`null`或`undefined`。如果是的，就不再往下运算，而是返回`undefined`。
 
-链判断运算符号有三种用法。
+链判断运算符有三种用法。
 
-- `obj?.prop` // 读取对象属性
+- `obj?.prop` // 对象属性
 - `obj?.[expr]` // 同上
 - `func?.(...args)` // 函数或对象方法的调用
 
-下面是判断函数是否存在的例子。
+下面是判断对象方法是否存在，如果存在就立即执行的例子。
 
 ```javascript
 iterator.return?.()
@@ -151,7 +159,18 @@ iterator.return?.()
 
 上面代码中，`iterator.return`如果有定义，就会调用该方法，否则直接返回`undefined`。
 
-下面是更多的例子。
+对于那些可能没有实现的方法，这个运算符尤其有用。
+
+```javascript
+if (myForm.checkValidity?.() === false) {
+  // 表单校验失败
+  return;
+}
+```
+
+上面代码中，老式浏览器的表单可能没有`checkValidity`这个方法，这时`?.`运算符就会返回`undefined`，判断语句就变成了`undefined === false`，所以就会跳过下面的代码。
+
+下面是这个运算符常见的使用形式，以及不使用该运算符时的等价形式。
 
 ```javascript
 a?.b
@@ -170,6 +189,8 @@ a?.()
 // 等同于
 a == null ? undefined : a()
 ```
+
+上面代码中，特别注意后两种形式，如果`a?.b()`里面的`a.b`不是函数，不可调用，那么`a?.b()`是会报错的。`a?.()`也是如此，如果`a`不是`null`或`undefined`，但也不是函数，那么`a?.()`会报错。
 
 使用这个运算符，有几个注意点。
 
@@ -193,28 +214,118 @@ a == null ? undefined : delete a.b
 
 上面代码中，如果`a`是`undefined`或`null`，会直接返回`undefined`，而不会进行`delete`运算。
 
-（3）报错场合
-
-以下写法是禁止，会报错。
+（3）括号不改变运算顺序
 
 ```javascript
-// 构造函数判断
+(a?.b).c
+// 等价于
+(a == null ? undefined : a.b).c
+```
+
+上面代码中，`?.`对圆括号没有影响，不管`a`对象是否存在，圆括号后面的`.c`总是会执行。
+
+一般来说，使用`?.`运算符的场合，不应该使用圆括号。
+
+（4）报错场合
+
+以下写法是禁止的，会报错。
+
+```javascript
+// 构造函数
 new a?.()
-
-// 运算符右侧是模板字符串
-a?.`{b}`
-
-// 链判断运算符前后有构造函数或模板字符串
 new a?.b()
+
+// 链判断运算符的右侧有模板字符串
+a?.`{b}`
 a?.b`{c}`
+
+// 链判断运算符的左侧是 super
+super?.()
+super?.foo
 
 // 链运算符用于赋值运算符左侧
 a?.b = c
 ```
 
-（4）右侧不得为十进制数值
+（5）右侧不得为十进制数值
 
 为了保证兼容以前的代码，允许`foo?.3:0`被解析成`foo ? .3 : 0`，因此规定如果`?.`后面紧跟一个十进制数字，那么`?.`不再被看成是一个完整的运算符，而会按照三元运算符进行处理，也就是说，那个小数点会归属于后面的十进制数字，形成一个小数。
+
+## Null 判断运算符
+
+读取对象属性的时候，如果某个属性的值是`null`或`undefined`，有时候需要为它们指定默认值。常见做法是通过`||`运算符指定默认值。
+
+```javascript
+const headerText = response.settings.headerText || 'Hello, world!';
+const animationDuration = response.settings.animationDuration || 300;
+const showSplashScreen = response.settings.showSplashScreen || true;
+```
+
+上面的三行代码都通过`||`运算符指定默认值，但是这样写是错的。开发者的原意是，只要属性的值为`null`或`undefined`，默认值就会生效，但是属性的值如果为空字符串或`false`或`0`，默认值也会生效。
+
+为了避免这种情况，现在有一个[提案](https://github.com/tc39/proposal-nullish-coalescing)，引入了一个新的 Null 判断运算符`??`。它的行为类似`||`，但是只有运算符左侧的值为`null`或`undefined`时，才会返回右侧的值。
+
+```javascript
+const headerText = response.settings.headerText ?? 'Hello, world!';
+const animationDuration = response.settings.animationDuration ?? 300;
+const showSplashScreen = response.settings.showSplashScreen ?? true;
+```
+
+上面代码中，默认值只有在属性值为`null`或`undefined`时，才会生效。
+
+这个运算符的一个目的，就是跟链判断运算符`?.`配合使用，为`null`或`undefined`的值设置默认值。
+
+```javascript
+const animationDuration = response.settings?.animationDuration ?? 300;
+```
+
+上面代码中，`response.settings`如果是`null`或`undefined`，就会返回默认值300。
+
+这个运算符很适合判断函数参数是否赋值。
+
+```javascript
+function Component(props) {
+  const enable = props.enabled ?? true;
+  // …
+}
+```
+
+上面代码判断`props`参数的`enabled`属性是否赋值，等同于下面的写法。
+
+```javascript
+function Component(props) {
+  const {
+    enabled: enable = true,
+  } = props;
+  // …
+}
+```
+
+`??`有一个运算优先级问题，它与`&&`和`||`的优先级孰高孰低。现在的规则是，如果多个逻辑运算符一起使用，必须用括号表明优先级，否则会报错。
+
+```javascript
+// 报错
+lhs && middle ?? rhs
+lhs ?? middle && rhs
+lhs || middle ?? rhs
+lhs ?? middle || rhs
+```
+
+上面四个表达式都会报错，必须加入表明优先级的括号。
+
+```javascript
+(lhs && middle) ?? rhs;
+lhs && (middle ?? rhs);
+
+(lhs ?? middle) && rhs;
+lhs ?? (middle && rhs);
+
+(lhs || middle) ?? rhs;
+lhs || (middle ?? rhs);
+
+(lhs ?? middle) || rhs;
+lhs ?? (middle || rhs);
+```
 
 ## 函数的部分执行
 
@@ -583,11 +694,14 @@ BigInt(1.5) // RangeError
 BigInt('1.5') // SyntaxError
 ```
 
-BigInt 对象继承了 Object 提供的实例方法。
+BigInt 对象继承了 Object 对象的两个实例方法。
 
-- `BigInt.prototype.toLocaleString()`
 - `BigInt.prototype.toString()`
 - `BigInt.prototype.valueOf()`
+
+它还继承了 Number 对象的一个实例方法。
+
+- `BigInt.prototype.toLocaleString()`
 
 此外，还提供了三个静态方法。
 
@@ -801,4 +915,194 @@ getPlayers()
 ::takeWhile(x => x.strength > 100)
 ::forEach(x => console.log(x));
 ```
+
+## Realm API
+
+[Realm API](https://github.com/tc39/proposal-realms) 提供沙箱功能（sandbox），允许隔离代码，防止那些被隔离的代码拿到全局对象。
+
+以前，经常使用`<iframe>`作为沙箱。
+
+```javascript
+const globalOne = window;
+let iframe = document.createElement('iframe');
+document.body.appendChild(iframe);
+const globalTwo = iframe.contentWindow;
+```
+
+上面代码中，`<iframe>`的全局对象是独立的（`iframe.contentWindow`）。Realm API 可以取代这个功能。
+
+```javascript
+const globalOne = window;
+const globalTwo = new Realm().global;
+```
+
+上面代码中，`Realm API`单独提供了一个全局对象`new Realm().global`。
+
+Realm API 提供一个`Realm()`构造函数，用来生成一个 Realm 对象。该对象的`global`属性指向一个新的顶层对象，这个顶层对象跟原始的顶层对象类似。
+
+```javascript
+const globalOne = window;
+const globalTwo = new Realm().global;
+
+globalOne.evaluate('1 + 2') // 3
+globalTwo.evaluate('1 + 2') // 3
+```
+
+上面代码中，Realm 生成的顶层对象的`evaluate()`方法，可以运行代码。
+
+下面的代码可以证明，Realm 顶层对象与原始顶层对象是两个对象。
+
+```javascript
+let a1 = globalOne.evaluate('[1,2,3]');
+let a2 = globalTwo.evaluate('[1,2,3]');
+a1.prototype === a2.prototype; // false
+a1 instanceof globalTwo.Array; // false
+a2 instanceof globalOne.Array; // false
+```
+
+上面代码中，Realm 沙箱里面的数组的原型对象，跟原始环境里面的数组是不一样的。
+
+Realm 沙箱里面只能运行 ECMAScript 语法提供的 API，不能运行宿主环境提供的 API。
+
+```javascript
+globalTwo.evaluate('console.log(1)')
+// throw an error: console is undefined
+```
+
+上面代码中，Realm 沙箱里面没有`console`对象，导致报错。因为`console`不是语法标准，是宿主环境提供的。
+
+如果要解决这个问题，可以使用下面的代码。
+
+```javascript
+globalTwo.console = globalOne.console;
+```
+
+`Realm()`构造函数可以接受一个参数对象，该参数对象的`intrinsics`属性可以指定 Realm 沙箱继承原始顶层对象的方法。
+
+```javascript
+const r1 = new Realm();
+r1.global === this;
+r1.global.JSON === JSON; // false
+
+const r2 = new Realm({ intrinsics: 'inherit' });
+r2.global === this; // false
+r2.global.JSON === JSON; // true
+```
+
+上面代码中，正常情况下，沙箱的`JSON`方法不同于原始的`JSON`对象。但是，`Realm()`构造函数接受`{ intrinsics: 'inherit' }`作为参数以后，就会继承原始顶层对象的方法。
+
+用户可以自己定义`Realm`的子类，用来定制自己的沙箱。
+
+```javascript
+class FakeWindow extends Realm {
+  init() {
+    super.init();
+    let global = this.global;
+
+    global.document = new FakeDocument(...);
+    global.alert = new Proxy(fakeAlert, { ... });
+    // ...
+  }
+}
+```
+
+上面代码中，`FakeWindow`模拟了一个假的顶层对象`window`。
+
+## `#!`命令
+
+Unix 的命令行脚本都支持`#!`命令，又称为 Shebang 或 Hashbang。这个命令放在脚本的第一行，用来指定脚本的执行器。
+
+比如 Bash 脚本的第一行。
+
+```bash
+#!/bin/sh
+```
+
+Python 脚本的第一行。
+
+```python
+#!/usr/bin/env python
+```
+
+现在有一个[提案](https://github.com/tc39/proposal-hashbang)，为 JavaScript 脚本引入了`#!`命令，写在脚本文件或者模块文件的第一行。
+
+```javascript
+// 写在脚本文件第一行
+#!/usr/bin/env node
+'use strict';
+console.log(1);
+
+// 写在模块文件第一行
+#!/usr/bin/env node
+export {};
+console.log(1);
+```
+
+有了这一行以后，Unix 命令行就可以直接执行脚本。
+
+```bash
+# 以前执行脚本的方式
+$ node hello.js
+
+# hashbang 的方式
+$ hello.js
+```
+
+对于 JavaScript 引擎来说，会把`#!`理解成注释，忽略掉这一行。
+
+## import.meta
+
+加载 JavaScript 脚本的时候，有时候需要知道脚本的元信息。Node.js 提供了两个特殊变量`__filename`和`__dirname`，用来获取脚本的文件名和所在路径。
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+const bytes = fs.readFileSync(path.resolve(__dirname, 'data.bin'));
+```
+
+上面代码中，`__dirname`用于加载与脚本同一个目录的数据文件`data.bin`。
+
+但是，浏览器没有这两个特殊变量。如果需要知道脚本的元信息，就只有手动提供。
+
+```html
+<script data-option="value" src="library.js"></script>
+```
+
+上面这一行 HTML 代码加载 JavaScript 脚本，使用`data-`属性放入元信息。如果脚本内部要获知元信息，可以像下面这样写。
+
+```javascript
+const theOption = document.currentScript.dataset.option;
+```
+
+上面代码中，`document.currentScript`属性可以拿到当前脚本的 DOM 节点。
+
+由于 Node.js 和浏览器做法的不统一，现在有一个[提案](https://github.com/tc39/proposal-import-meta)，提出统一使用`import.meta`属性在脚本内部获取元信息。这个属性返回一个对象，该对象的各种属性就是当前运行的脚本的元信息。具体包含哪些属性，标准没有规定，由各个运行环境自行决定。
+
+一般来说，浏览器的`import.meta`至少会有两个属性。
+
+- `import.meta.url`：脚本的 URL。
+- `import.meta.scriptElement`：加载脚本的那个`<script>`的 DOM 节点，用来替代`document.currentScript`。
+
+```html
+<script type="module" src="path/to/hamster-displayer.js" data-size="500"></script>
+```
+
+上面这行代码加载的脚本内部，就可以使用`import.meta`获取元信息。
+
+```javascript
+(async () => {
+  const response = await fetch(new URL("../hamsters.jpg", import.meta.url));
+  const blob = await response.blob();
+
+  const size = import.meta.scriptElement.dataset.size || 300;
+
+  const image = new Image();
+  image.src = URL.createObjectURL(blob);
+  image.width = image.height = size;
+
+  document.body.appendChild(image);
+})();
+```
+
+上面代码中，`import.meta`用来获取所加载的图片的尺寸。
 
