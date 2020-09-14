@@ -10,7 +10,7 @@ ES6 模块的设计思想是尽量的静态化，使得编译时就能确定模�
 
 ```javascript
 // CommonJS模块
-let { stat, exists, readFile } = require('fs');
+let { stat, exists, readfile } = require('fs');
 
 // 等同于
 let _fs = require('fs');
@@ -540,20 +540,20 @@ export default es6;
 export { default as es6 } from './someModule';
 ```
 
-下面三种`import`语句，没有对应的复合写法。
+ES2020 之前，有一种`import`语句，没有对应的复合写法。
 
 ```javascript
 import * as someIdentifier from "someModule";
-import someIdentifier from "someModule";
-import someIdentifier, { namedIdentifier } from "someModule";
 ```
 
-为了做到形式的对称，现在有[提案](https://github.com/leebyron/ecmascript-export-default-from)，提出补上这三种复合写法。
+[ES2020](https://github.com/tc39/proposal-export-ns-from)补上了这个写法。
 
 ```javascript
-export * as someIdentifier from "someModule";
-export someIdentifier from "someModule";
-export someIdentifier, { namedIdentifier } from "someModule";
+export * as ns from "mod";
+
+// 等同于
+import * as ns from "mod";
+export {ns};
 ```
 
 ## 模块的继承
@@ -670,7 +670,7 @@ const myModual = require(path);
 
 上面的语句就是动态加载，`require`到底加载哪一个模块，只有运行时才知道。`import`命令做不到这一点。
 
-因此，有一个[提案](https://github.com/tc39/proposal-dynamic-import)，建议引入`import()`函数，完成动态加载。
+[ES2020提案](https://github.com/tc39/proposal-dynamic-import) 引入`import()`函数，支持动态加载模块。
 
 ```javascript
 import(specifier)
@@ -800,3 +800,4 @@ async function main() {
 }
 main();
 ```
+
