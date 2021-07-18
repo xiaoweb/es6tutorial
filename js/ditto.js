@@ -243,8 +243,8 @@ function li_create_linkage(li_tag, header_level) {
 }
 
 function create_banner(element) {
-  // 2021年2月3日
-  var deadline = new Date(2021, 1, 3);
+  // 2021年6月7日
+  var deadline = new Date(2021, 5, 7);
   if (deadline - (new Date()) < 0) return;
 
   var styleStr = [
@@ -258,10 +258,10 @@ function create_banner(element) {
     'color: #333333'
   ].join(';');
 
-  var text = '【免费课程】' +
-    '<span style="color: #4682BE;">《Vue进阶攻略》</span>领取，Vue 3.0 新知识点讲解。';
+  var text = '【前端课程】' +
+    '<span style="color: #4682BE;">《React Hooks 核心原理与实战》</span>通过实战案例，详细讲解 Hooks，现在优惠中。';
 
-  var banner = $('<a href="https://datayi.cn/w/4PK5pQJ9" style="color: #333333;" target="_blank"><div style="' + styleStr + '">' + text + '</div></a>')
+  var banner = $('<a href="https://sourl.cn/zDZrCg" style="color: #333333;" target="_blank"><div style="' + styleStr + '">' + text + '</div></a>')
     .insertAfter(element);
 }
 
