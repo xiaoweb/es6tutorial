@@ -606,6 +606,23 @@ foo
 // {0: "h", 1: "e", 2: "l", 3: "l", 4: "o"}
 ```
 
+对象的扩展运算符，只会返回参数对象自身的、可枚举的属性，这一点要特别小心，尤其是用于类的实例对象时。
+
+```javascript
+class C {
+  p = 12;
+  m() {}
+}
+
+let c = new C();
+let clone = { ...c };
+
+clone.p; // ok
+clone.m(); // 报错
+```
+
+上面示例中，`c`是`C`类的实例对象，对其进行扩展运算时，只会返回`c`自身的属性`c.p`，而不会返回`c`的方法`c.m()`，因为这个方法定义在`C`的原型对象上（详见 Class 的章节）。
+
 对象的扩展运算符等同于使用`Object.assign()`方法。
 
 ```javascript
@@ -708,7 +725,7 @@ let aWithXGetter = { ...a }; // 报错
 
 ES2021 标准之中，为了配合新增的`Promise.any()`方法（详见《Promise 对象》一章），还引入一个新的错误对象`AggregateError`，也放在这一章介绍。
 
-AggregateError 在一个错误对象里面，封装了多个错误。如果某个单一操作，同时引发了多个错误，，需要同时抛出这些错误，那么就可以抛出一个 AggregateError 错误对象，把各种错误都放在这个对象里面。
+AggregateError 在一个错误对象里面，封装了多个错误。如果某个单一操作，同时引发了多个错误，需要同时抛出这些错误，那么就可以抛出一个 AggregateError 错误对象，把各种错误都放在这个对象里面。
 
 AggregateError 本身是一个构造函数，用来生成 AggregateError 实例对象。
 
