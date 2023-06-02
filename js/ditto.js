@@ -15,6 +15,7 @@ var ditto = {
     theme_button: true,
     save_progress: true, // 保存阅读进度
     search_bar: true,
+    wwads: true,
 
     // initialize function
     run: initialize
@@ -78,6 +79,10 @@ function init_sidebar_section() {
            init_searchbar();
         }
 
+        if (ditto.wwads) {
+          init_wwads();
+        }
+
         // 初始化内容数组
         var menuOL = $(ditto.sidebar_id + ' ol');
         menuOL.attr('start', 0);
@@ -125,7 +130,7 @@ function searchbar_listener(event) {
     if (q !== '') {
       var url = 'https://github.com/ruanyf/es6tutorial/search?utf8=✓&q=' + encodeURIComponent(q);
       window.open(url, '_blank');
-      win.focus();
+      window.focus();
     }
     return false;
   /*
@@ -137,6 +142,11 @@ function searchbar_listener(event) {
     }
   }
   */
+}
+
+function init_wwads() {
+  var wwads = '<div class="wwads-cn wwads-horizontal" data-id="197" style="max-width:100%;"></div>';
+  $(ditto.sidebar_id).find('h2').first().before($(wwads));
 }
 
 function init_theme_button() {
@@ -357,7 +367,7 @@ function statistics() {
   s.parentNode.insertBefore(hm, s);
 }
 
-function router() { 
+function router() {
   var path = location.hash.replace(/#([^#]*)(#.*)?/, './$1');
 
   var hashArr = location.hash.split('#');
